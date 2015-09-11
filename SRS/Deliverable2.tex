@@ -1,0 +1,742 @@
+\title{Deliverable \#2}
+\author{Philip Gabardo, Thomas Woudenburg, Shane Noormohamed,\\ Matthew Paine, Joshua Barkovic, Jonathan Beadle, Jeff Buscarino}
+\date{\today}
+\documentclass[12pt]{article}
+\usepackage{placeins}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{tabularx}
+\begin{document}
+\maketitle
+\section{Introduction}
+\subsection{Purpose}
+The purpose for this document is to establish the domain and requirements of the proposed medical application: "MedConnect". This will be achieved through object oriented analysis using UML diagrams. The intended audience for this document is the developers of the system.
+
+\subsection{System Description}
+MedConnect will be a mobile medical records system to be used by doctors, nurses and patients. The system will be designed to maximize AccessCtrl for the purpose of maintaining the confidentiality, integrity and availability of the information. The system will store data remotely in a digital format, reducing the need for paper usage to keep track of patient records. By maximizing the AccessCtrl and portability of user information, the system will meet the users' needs for privacy while remaining efficient.
+
+The system will be used by doctors, nurses and patients to coordinate appointments and track relevant medical information about patients. MedConnect will allow authorised users to view, create, modify, and remove patients, charts and appointments based on permissions. The system will also include a feature for doctors to plot certain patient data. All data will be stored in an encrypted form. MedConnect will restrict users from accessing certain information based on user permissions.
+
+\subsection{Overview}
+
+The next section of this document includes use case diagrams which illustrate the functional requirements of the system. The following section includes an analysis class diagram that will depict the overall design of the system. Next, the architectural design of the system will be defined explicitly. The final section includes Class Responsibility Collaboration (CRC) Cards for all classes included in the system. The appendix contains a signed document that confirms that contributions of each team member.
+\newpage
+\section{Use Case Diagrams}
+Any use cases with identical names are in fact identical use cases.
+\subsection{Administrator}
+\begin{figure}[h]
+\includegraphics[scale=0.55]{Administrator.jpg}
+\caption{Administrator Use Case Diagram}
+\label{fig:jobInformationDialog}
+\end{figure} 
+\newpage
+\subsection{Doctor}
+\begin{figure}[h]
+\includegraphics[scale=0.55]{Doctor.jpg}
+\caption{Doctor Use Case Diagram}
+\label{fig:jobInformationDialog}
+
+\end{figure}
+Note: In the "Select Patient" use case, the doctor either manually enters the patent's name or scans the patient's QR code.
+\newpage
+\subsection{Patient}
+\begin{figure}[h]
+\includegraphics[scale=0.55]{Patient.jpg}
+\caption{Patient Use Case Diagram}
+\label{fig:jobInformationDialog}
+
+\end{figure}
+\newpage
+\subsection{Nurse}
+\begin{figure}[h]
+\includegraphics[scale=0.55]{Nurse.jpg}
+\caption{Nurse Use Case Diagram}
+\label{fig:jobInformationDialog}
+\end{figure}
+Note: In the "Select Patient" use case, the nurse either manually enters the patent's name or scans the patient's QR code. In the "Select Doctor" use case, the nurse either manually enters the doctor's name or scans the doctor's QR code.
+\newpage
+\section{Analysis Class Diagram\\}
+
+\begin{figure}[ht]
+\includegraphics[scale=0.35]{ACD.png}
+\caption{Analysis Class Diagram}
+\label{fig:jobInformationDialog}
+\end{figure} 
+\section{Architectural Design}
+\subsection{System Architecture}
+The overall system is best thought of as a combination of three sub-systems; the Data Store, the AccessCtrl Subsystem, and the User Interface. Each of these sub-systems will require different Software Architectural Styles to fulfil their unique requirements as detailed below. The only generalization that can be made to the larger system as a whole, is that it will need to be a predominantly Data-Centric design. 
+\begin{figure}[here]
+\includegraphics[height=10cm,width=15cm]{Architecture.png}
+\caption{System Architecture}
+\label{fig:jobInformationDialog}
+\end{figure}
+\newpage
+\subsection{Subsystems}
+\begin{enumerate}
+\item Data Store
+\begin{itemize}
+\item Description: The Data Store system will include the physical data storage mechanism that stores the medical information this system is required to manage (see SRS Document), as well as the interface mechanism that provides an implementation-independent API between the aforementioned storage mechanism and the rest of the system.
+\item Architecture: The Data Store system will be designed adhering to a Repository Architecture style. This decision was made for the following reasons:
+\begin{itemize}
+\item The role of this sub-system is predominantly the storage, maintenance and retrieval of data and thus requires a Data-Centric approach to it's design.
+\item This sub-system requires a fixed number of data storage elements and is required to interface with a variable number of actors placing simultaneous requests (see class diagram).
+\end{itemize}
+\end{itemize}
+\item AccessCtrl
+\begin{itemize}
+\item Description: The AccessCtrl sub-system acts as a transaction system between the User Interface and the Data Store sub-systems. There will need to exist a local instance of the AccessCtrl sub-system for each user session. The AccessCtrl sub-system has two main roles:
+\begin{itemize}
+\item To selectively allow and dis-allow communication to and from the Data Store based on: the clearance level required to access the data that is being requested, and the clearance level of the user that has requested the data (based on the user's group designation).
+\item To encrypt data all sent to the Data Store sub-system, and to decrypt all data received from the Data Store sub-system.
+\end{itemize}
+\item Architecture: This sub-system will be designed adhering to a Batch-Sequential software architecture style. This decision was made for the following reasons:
+\begin{itemize}
+\item This is a Data-Centric sub-system.
+\item All data that passes through the AccessCtrl sub-system is encrypted/decrypted as a whole before it exits.
+\item Only one unit of data will need to be processed by this system at a time (an instance of this system is created for each individual user session, thus only one request will be made at a time, and user will wait for the result) therefore a sophisticated form of pipe-lining is not required.
+\end{itemize}
+\end{itemize}
+\item User Interface
+\begin{itemize}
+\item Description:The User Interface sub-system handles all user requests entered into the system and displays the results of those actions back to the user.
+\item Architecture: The User Interface sub-system will be designed adhering to an Event Driven software architecture. This decision was made for the following reasons:
+\begin{itemize}
+\item Although this system handles the same data as the other sub-systems (entry and display), the primary role of this sub-system however is to handle user requests.
+\item Since user requests are asynchronous and highly unpredictable. A design methodology adept at producing a system capable of handling these types of requirements reliably is required. 
+\end{itemize}
+\end{itemize}
+\end{enumerate}
+\section{Class Responsibility Collaboration (CRC) Cards}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: AdminStartPage}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Know AdminCtrl& \\ \hline
+Handle button-click event of \emph{Add New User} button & AdminCtrl \\ \hline
+Handle button-click event of \emph{Modify User} button & AdminCtrl \\ \hline
+Handle button-click event of \emph{Log Out} button & AdminCtrl \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: AddUser}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Know username of new user & \\ \hline
+Know password of new user & \\ \hline
+Know group of new user & \\ \hline
+Know personal information (ie. first name, last name, phone number, email) of new user & \\ \hline
+Know AdminCtrl &  \\ \hline
+Handle button-click event of \emph{Submit} button & AdminCtrl \\ \hline
+ Display an error message if the username already exists in the system& \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: ModUser}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Know username of account to modify             &                                  \\ \hline
+Know new information of account to modify           &                                   \\ \hline
+Know AdminCtrl           &                                   \\ \hline
+Handle button-click event of \emph{Update} button & AdminCtrl \\ \hline
+Handle button-click event of \emph{Delete} button & AdminCtrl \\ \hline
+ Display an error message if the username doesn't exist in the system& \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: AdminCtrl}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Know AccessCtrl                             &                                  \\ \hline 
+Know AdminStartPage                  &                             \\ \hline
+Know AddUser                                &                                 \\ \hline
+Know ModifyUser                                   &                                 \\ \hline
+Know LoginPage                                   &                                 \\ \hline
+Handle logout request                                 &  DataConnection                                 \\ \hline
+Add a user to the system & AccessCtrl, DataConnection \\ \hline
+Delete a user from the system & AccessCtrl, DataConnection\\ \hline
+Modify an existing user in the system & AccessCtrl, DataConnection\\ \hline
+
+
+
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: NurseStartPage}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Know NurseCtrl & \\ \hline
+Handle button-click event of \emph{Add New Appointment} button & NurseCtrl \\ \hline
+Handle button-click event of \emph{Modify Apppointment} button & NurseCtrl \\ \hline
+Handle button-click event of \emph{Log Out} button & NurseCtrl \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: NurseCreateAppointmentPage}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Know NurseCtrl & \\ \hline
+Know information of the appointment to be scheduled& ScanQR \\ \hline
+Handle button-click event of \emph{Add Appointment} button & NurseCtrl \\ \hline
+Display an error message if the time of the appointment to be scheduled is in the past, or if the appointment to be scheduled conflicts with another appointment&  \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: NurseModifyAppointment}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Display information of appointment to be modified & \\ \hline
+Know new information of appointment to be modified & \\ \hline
+Handle button-click event of \emph{Modify} button & NurseCtrl \\ \hline
+Handle button-click event of \emph{Delete} button & NurseCtrl \\ \hline
+Display an error message if the new time of the appointment to be modified is in the past, or if the new appointment information conflicts with another appointment \\ \hline
+
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: ScanQR}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Decode a QR code & \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: NurseCtrl}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Know AccessCtrl                             &                                  \\ \hline 
+Know NurseStartPage                  &                             \\ \hline
+Know AddAppointmentPage                            &                                 \\ \hline
+Know NurseModifyAppointment                                   &                                 \\ \hline
+Know ViewPatientData                                   &                                 \\ \hline
+Handle logout request                                 &  DataConnection                                 \\ \hline
+Add an appointment to the system & AccessCtrl, DataConnection \\ \hline
+Delete an appointment from the system & AccessCtrl, DataConnection\\ \hline
+Modify an appointment in the system & AccessCtrl, DataConnection\\ \hline
+Retrieve an appointment from the system & AccessCtrl, DataConnection\\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: LoginPage}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+ Know username of user& \\ \hline
+Know password of user& \\ \hline
+Know LogINOUTCtrl & \\ \hline
+Handle button-click event of \emph{Submit} button & LogINOUTCtrl \\ \hline
+Display an error message if the user's username-password pair does not exist in the system &  \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: LogINOUTCtrl}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Handle login request  & \\ \hline
+Know LoginPage  & \\ \hline
+Know AccessCtrl  & \\ \hline
+Create AdminCtrl  & \\ \hline
+Create PatientCtrl  & \\ \hline
+Create NurseCtrl  & \\ \hline
+Create DocCtrl  & \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: AccessCtrl}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Determine access permissions of user & \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: EncryptDecrypt}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Encrypt data & \\ \hline
+Decrypt data & \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: DataConnection}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Verify the existence of a username in the database & \\ \hline
+Add a user's username, password, group and personal information to the database  & \\ \hline
+Update a user's password, group or personal information in the database  & \\ \hline
+Delete a user's username, password, group and personal information in the database  & \\ \hline
+Add a patient's chart to the database  & \\ \hline
+Update a patient's chart in the database  & \\ \hline
+Delete a patient's chart from the database  & \\ \hline
+Add an appointment to the database  & \\ \hline
+Update an appointment in the database  & \\ \hline
+Delete an appointment from the database  & \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: DocStartPage}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Know DocCtrl & \\ \hline
+Handle button-click event of \emph{View Patient Chart} button & DocCtrl \\ \hline
+Handle button-click event of \emph{Modify Patient Chart} button & DocCtrl \\ \hline
+Handle button-click event of \emph{View Appointments} button & DocCtrl \\ \hline
+Handle button-click event of \emph{GenerateQR} button & DocCtrl \\ \hline
+Handle button-click event of \emph{Plot Patient Data} button & DocCtrl \\ \hline
+Handle button-click event of \emph{Log Out} button & DocCtrl \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: DocModPData}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Know DocCtrl & \\ \hline
+Know patient & ScanQR \\ \hline
+Know updated information for patient chart & ScanQR \\ \hline
+Handle button-click event of \emph{Modify} button & DocCtrl \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: PlotPData}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Know DocCtrl & \\ \hline
+Know patient & ScanQR \\ \hline
+Plot patient's height and weight over time \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: GenerateQR}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Know user & \\ \hline
+Generate a QR Code encoding the user's username &  \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: DocCtrl}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Know AccessCtrl                             &                                  \\ \hline 
+Know DocStartPage                  &                             \\ \hline
+Know PlotPData                  &                             \\ \hline
+Know ViewPatientData                              &                                 \\ \hline
+Know DocModPData                                  &                                 \\ \hline
+Know ViewAppointments                                   &                                 \\ \hline
+Handle logout request                                 &  DataConnection                                 \\ \hline
+Update a patient chart in the system & AccessCtrl, DataConnection \\ \hline
+Retrieve a patient chart from the system & AccessCtrl, DataConnection\\ \hline
+Retrieve a doctor's appointments from the system & AccessCtrl, DataConnection\\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: ViewPatientData}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Know patient & ScanQR \\ \hline
+Display patient's chart & \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: PatientStartPage}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Know PatientCtrl & \\ \hline
+Handle button-click event of \emph{View Prescriptions} button & PatientCtrl \\ \hline
+Handle button-click event of \emph{View Appointments} button & PatientCtrl \\ \hline
+Handle button-click event of \emph{View Reminders} button & PatientCtrl \\ \hline
+Handle button-click event of \emph{Generate QR Code} button & PatientCtrl \\ \hline
+Handle button-click event of \emph{Logout} button & PatientCtrl \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: PatientCtrl}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Know AccessCtrl                             &                                  \\ \hline 
+Know PatientStartPage                  &                             \\ \hline
+Know ViewPatientData                  &                             \\ \hline
+Know ViewPrescriptionsPage                                &                                 \\ \hline
+Know ViewAppointmentPage                                  &                                 \\ \hline
+Know ViewRemindersPage                                   &                                 \\ \hline
+Handle logout request                                 &  DataConnection                                 \\ \hline
+Retrieve a patient's prescriptions from the system & AccessCtrl, DataConnection\\ \hline
+Retrieve a patient's appointments from the system & AccessCtrl, DataConnection\\ \hline
+Retrieve a patient's reminders from the system & AccessCtrl, DataConnection\\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|X|r|} \hline
+\multicolumn{2}{|c|}{\textbf{Class: ViewAppointments}}\\ \hline
+\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+Display patient's appointments & \\ \hline
+\end{tabularx}
+\newline\newline
+\end{center}
+
+
+
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: AdminStartPage}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+% Display the current users in the system                   &            AdminCtrl                       \\ \hline
+% Receive input from the administrator                                  &                                   \\ \hline
+%Prompt the administrator to add a user to the system                                &                                   \\ \hline
+%Prompt the administrator to modify a user in the system                             &                                   \\ \hline 
+%Prompt the administrator to log out &              \\ \hline
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: AddUser}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+%   Prompt the administrator for new account information      &                               \\ \hline
+%   Recieve input from the administrator                            &                                   \\ \hline
+%    Request to add a user to the system                           &       AdminCtrl                            \\ \hline 
+%Display an error message                         &                                   \\ \hline 
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: ModifyUser}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+% Prompt the administrator for an account username             &                                  \\ \hline
+%Prompt the administrator for changes to a user account                                &                                   \\ \hline
+%Prompt the administrator to delete a user account                                  &                                   \\ \hline
+%Receive input from the administrator                           &                                   \\ \hline 
+%Request to update the user information in the system                        &     AdminCtrl           \\ \hline 
+%Request to the delete a user from the system                             &     AdminCtrl                  \\ \hline 
+%Display an error message                         &                                   \\ \hline 
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: AdminCtrl}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+%Request data from AccessCtrl                             &                         AccessCtrl          \\ \hline 
+%Forward data to AccessCtrl                             &               AccessCtrl                    \\ \hline 
+% Navigate to AdminStartPage                  &            AdminStartPage                       \\ \hline
+% Navigate to AddUser                                &               AddUser                    \\ \hline
+%Navigate to ModifyUser                                   &                      ModifyUser             \\ \hline
+%Navigate to LoginPage                                   &                      LogINOUTCtrl             \\ \hline
+%Forward data to AdminStartPage                  &            AdminStartPage                       \\ \hline
+%Forward data to AddUser                                &               AddUser                    \\ \hline
+%Forward data to ModifyUser                                   &                      ModifyUser             \\ \hline
+%Forward data to LoginPage                                   &                      LogINOUTCtrl             \\ \hline
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: NurseStartPage}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+% Display all existings appointments in the system                   &            AdminCtrl              \\ \hline
+% Receive input from the nurse                                 &                                   \\ \hline
+%Prompt the nurse to add a new appointment to the system                      &                                   \\ \hline
+%Prompt the nurse to modify an existing appointment in the system                 &                                   \\ \hline 
+%Prompt the nurse to log out &              \\ \hline
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: NurseCreateAppointment}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+% Prompt the nurse for appointment information                   &            ScanQR              \\ \hline
+% Receive input from the nurse                                 &                                   \\ \hline
+%Request to add the appointment to the system                              &       AdminCtrl                            \\ \hline
+%Display an error message                         &                                   \\ \hline 
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: NurseModifyAppointment}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+% Prompt the nurse to identify an existing appointment                   &                       \\ \hline
+% Prompt nurse for changes to an existing appointment                                 &                                   \\ \hline
+% Prompt nurse to delete an existing appointment                                 &                                   \\ \hline
+%Receive input from the nurse                              &                                   \\ \hline
+%Request to update an existing appointment information in the system    &  AdminCtrl          \\ \hline
+%Request to delete an existing appointment in the system                              &   AdminCtrl      \\ \hline
+%Display an error message                         &                                   \\ \hline 
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: ScanQR}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+%Decode a QR Code             &                       \\ \hline
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: NurseCtrl}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+% Navigate to NurseStartPage                  &            NurseStartPage                       \\ \hline
+% Navigate to NurseCreateAppointment                                &                NurseCreateAppointment \\ \hline
+%Navigate to NurseModifyAppointment                                   &  NurseModifyAppointment              \\ \hline
+%Navigate to LoginPage                                   &                      LogINOUTCtrl             \\ \hline
+%Forward data to NurseStartPage                  &            NurseStartPage                       \\ \hline
+%Forward data to NurseCreateAppointment                                &                NurseCreateAppointment \\ \hline
+%Forward data to NurseModifyAppointment                                   &  NurseModifyAppointment              \\ \hline
+%Forward data to LoginPage                                   &                      LogINOUTCtrl             \\ \hline
+%Request data from AccessCtrl                             &                         AccessCtrl          \\ \hline 
+%Forward data to AccessCtrl                             &               AccessCtrl                    \\ \hline 
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: LoginPage}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+%  Prompt the user for login credentials                 &                                   \\ \hline
+%Receive input from the user                               &                 \\ \hline
+%Verify login credentials                                &  LogINOUTCtrl              \\ \hline
+%Display an error message                         &                                   \\ \hline 
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: LogINOUTCtrl}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+% Request data from AccessCtrl                &    AccessCtrl                               \\ \hline
+%Forward data to AccessCtrl                           &    AccessCtrl             \\ \hline
+%Navigate to LoginPage & LoginPage \\ \hline
+%Forward data to LoginPage & LoginPage \\ \hline
+%Start AdminCtrl                           &    AdminCtrl             \\ \hline
+%Start PatientCtrl                         &    PatientCtrl             \\ \hline
+%Start NurseCtrl                           &    NurseCtrl             \\ \hline
+%Start DocCtrl                           &    DocCtrl             \\ \hline
+%
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: AccessCtrl}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+% Encrypt data received from AdminCtrl                   &    AdminCtrl                  \\ \hline
+%Encrypt data received from PatientCtrl                  &     PatientCtrl                 \\ \hline
+%Encrypt data received from NurseCtrl                   &      NurseCtrl                \\ \hline
+%Encrypt data received from DocCtrl                 &       DocCtrl               \\ \hline
+%Encrypt data received from LogINOUTCtrl                 &       LogINOUTCtrl               \\ \hline
+%Forward encrypted data to DataConnection & DataConnection \\ \hline
+%Decrypt data received from DataConnection & DB Interface \\ \hline
+%Forward decrypted data to AdminCtrl                  &    AdminCtrl                  \\ \hline 
+%Forward decrypted data to PatientCtrl                  &       PatientCtrl               \\ \hline  
+%Forward decrypted data to NurseCtrl                  &   NurseCtrl                   \\ \hline 
+%Forward decrypted data to DocCtrl                  &       DocCtrl               \\ \hline 
+%Forward decrypted data to LogINOUTCtrl                  &       LogINOUTCtrl               \\ \hline
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: DataConnection}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+% Retrieve data from the remote data repository and forward it to AccessCtrl   &        AccessCtrl      \\ \hline
+%Retrieve data from AccessCtrl and forward it to the remote data repository & AccessCtrl              \\ \hline
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: DocStartPage}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+% Display the associated patients of the doctor  &        DocCtrl      \\ \hline
+%Receive input from the doctor & \\ \hline
+%Prompt the doctor to view a patient chart &              \\ \hline
+%Prompt the doctor to modify a patient chart &              \\ \hline
+%Prompt the doctor to view his/her appointments &              \\ \hline
+%Prompt the doctor to plot patient data &              \\ \hline
+%Prompt the doctor to log out &              \\ \hline
+%
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: DocCtrl}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+%
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: ViewPatientData}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+%Prompt the doctor for a patient username  &        ScanQR     \\ \hline
+%Display the selected patient's chart  & DocCtrl            \\ \hline
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: PatientStartPage}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+%Receive input from the patient & \\ \hline
+%Prompt the patient to view his/her prescriptions &    ViewPrescriptions          \\ \hline
+%Prompt the patient to view his/her reminders &       ViewReminders       \\ \hline
+%Prompt the patient to view his/her appointments &    ViewAppointments          \\ \hline
+%Prompt the patient to log out &              \\ \hline
+%
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: PatientCtrl}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+%Navigate to ViewPrescriptions  &        ViewPrescriptions     \\ \hline
+%Navigate to ViewReminders     &   ViewReminders     \\ \hline
+%Navigate to ViewAppointments  &     ViewAppointments      \\ \hline
+%Navigate to LoginPage&    LoginPage         \\ \hline
+% Request data from AccessCtrl   &        AccessCtrl      \\ \hline
+%Forward data to AccessCtrl & AccessCtrl              \\ \hline
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: ViewPrescriptions}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+%Display all of the patient's prescriptions  &        PatientCtrl     \\ \hline
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: ViewReminders}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+%Display all of the patient's reminderss  &        PatientCtrl     \\ \hline
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%\begin{center}
+%\begin{tabularx}{\textwidth}{|X|r|} \hline
+%\multicolumn{2}{|c|}{\textbf{Class: ViewAppointments}}\\ \hline
+%\textbf{Responsibility} & \textbf{Collaborator} \\ \hline
+%Display all of the user's future appointments  &        PatientCtrl     \\ \hline
+%\end{tabularx}
+%\newline\newline
+%\end{center}
+%
+%
+\newpage
+\appendix{\huge{Appendix: Contributions}}\\
+\\
+\underline{\textbf{\\Work Objectives:}}\\
+\begin{enumerate}
+\item System Functionality (Figuring out how the system will work)
+\item \LaTeX Formatting
+\item Document Editing
+\item Section 1: Introduction
+\item Section 2: Use Case Diagrams
+\item Section 3: Analysis Class Diagrams
+\item Section 4: Architectural Design
+\item CRC Cards
+\end{enumerate}
+\underline{\textbf{Member Contributions:}}\\
+\\
+\textbf{Matt Paine:} Use Case Diagrams (13\%), Analysis Class Diagram (13\%), CRC (15\%)\\ \\
+\textbf{Josh Barkovic:} Use Case Diagrams (13\%), Analysis Class Diagram (13\%), Architectural Design (100\%), CRC (15\%)\\ \\
+\textbf{Jeff Buscarino:} Use Case Diagrams (13\%), Analysis Class Diagram (13\%), CRC (15\%)\\ \\
+\textbf{Thomas Woudenberg} Use Case Diagrams (13\%), Analysis Class Diagram (13\%), CRC (15\%)\\ \\
+\textbf{Shane Noormohamed:} Use Case Diagrams (13\%), Analysis Class Diagram (13\%), CRC (15\%)\\ \\
+\textbf{Jonathan Beadle:} Use Case Diagrams (13\%), Analysis Class Diagram (22\%), CRC (15\%)\\ \\
+\textbf{Matt Paine:} Use Case Diagrams (22\%), Analysis Class Diagram (13\%), Introduction (100\%), \LaTeX Formatting (100\%), CRC (15\%)\\ \\
+\\
+\\
+Note:
+The amount of entries in each member’s contribution list is not necessarily a good depiction of how much work they have completed. As some work objectives were much larger than others.\newline
+
+
+
+
+
+\end{document}
+
+
+
+
+
